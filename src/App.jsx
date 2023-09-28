@@ -4,8 +4,25 @@ import { nanoid } from "nanoid";
 import { ToastContainer, toast } from "react-toastify";
 import Items from "./Items";
 
+const getLocalStorage = () => {
+  let list = localStorage.getItem("list");
+
+  if (list) {
+    JSON.parse(localStorage.getItem("list"));
+  } else {
+    list = [];
+  }
+
+  return list;
+};
+const setLocalStorage = (items) => {
+  localStorage.setItem("list", JSON.stringify(items));
+};
+
+const defaultList = JSON.parse(localStorage.getItem("list")) || [];
 const App = () => {
-  const [items, setItems] = useState([]);
+  getLocalStorage();
+  const [items, setItems] = useState(defaultList);
 
   const addItem = (itemName) => {
     const newItem = {
@@ -13,12 +30,18 @@ const App = () => {
       completed: false,
       id: nanoid(),
     };
-
-    setItems([...items, newItem]);
+    const newItems = [...items, newItem];
+    setItems(newItems);
+    setLocalStorage(newItems);
     toast.success("successfully added an item");
   };
 
-  const removeItem = () => {};
+  const removeItem = (itemId) => {
+    const newItems = items.filter((item) => item.id !== itemId);
+    setItems(newItems);
+    setLocalStorage(newItems);
+    toast.success("Deleted the item");
+  };
 
   return (
     <section className="section-center">
